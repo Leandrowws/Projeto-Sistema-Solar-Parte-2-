@@ -81,16 +81,6 @@ class TabelaHash(IEstruturaBusca):
     def existe(self, chave: str) -> bool:
         return self.buscar(chave) is not None
 
-    def remover(self, chave: str) -> bool:
-        indice = self._hash(chave)
-        bucket = self._buckets[indice]
-        for i, (k, _) in enumerate(bucket):
-            if k == chave:
-                del bucket[i]
-                self._quantidade_elementos -= 1
-                return True
-        return False
-
     def todos_valores(self) -> List[Any]:
         return [valor for bucket in self._buckets for (_, valor) in bucket]
 

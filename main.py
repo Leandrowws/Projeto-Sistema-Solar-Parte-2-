@@ -23,7 +23,9 @@ def exibir_menu() -> None:
     print(" 7  - Filtrar por faixa de distancia (km)")
     print(" 8  - Listar ordenado por distancia")
     print(" 9  - Ver estatisticas da Tabela Hash (colisoes / fator de carga)")
-    print(" 10 - Planejar missao (algoritmo guloso)")
+    print(" 10  - Ver estatisticas da Trie (Nós visitados / Total de Nós)")
+    print(" 11  - Ver estatisticas da Arvore B (Altura / Divisões)")
+    print(" 12 - Planejar missao (algoritmo guloso)")
     print(" 0  - Sair")
     print("=" * 55)
 
@@ -94,6 +96,14 @@ def main() -> None:
             sistema.imprimir_estatisticas_hash()
 
         elif opcao == "10":
+            print(f"Quantidade de corpos carregados: {sistema.quantidade_corpos()}")
+            sistema.imprimir_estatisticas_trie()
+
+        elif opcao == "11":
+                    print(f"Quantidade de corpos carregados: {sistema.quantidade_corpos()}")
+                    sistema.imprimir_estatisticas_arvore_b()
+
+        elif opcao == "12":
             try:
                 combustivel = float(input("Combustivel total da nave (em milhoes de km): ").strip())
                 custo_parada = float(input("Custo fixo de combustivel por parada (em milhoes de km): ").strip())

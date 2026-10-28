@@ -20,12 +20,6 @@ class IEstruturaBusca(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def remover(self, chave: str) -> bool:
-        """Remove a chave da estrutura. Retorna True se removeu, False se
-        a chave nao existia."""
-        raise NotImplementedError
-
-    @abstractmethod
     def existe(self, chave: str) -> bool:
         """Verifica se uma chave esta presente na estrutura."""
         raise NotImplementedError

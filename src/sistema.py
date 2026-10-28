@@ -17,14 +17,24 @@ from src.api.solar_system_client import (
     buscar_corpos_da_api,
     carregar_corpos_de_arquivo,
 )
-from src.estruturas.tabela_hash import TabelaHash
-from src.modelos.corpo_celeste import CorpoCeleste
 
+from src.estruturas.tabela_hash import TabelaHash
+from src.estruturas.trie import Trie
+from src.estruturas.arvore_b import ArvoreB
+
+from src.modelos.corpo_celeste import CorpoCeleste
 
 class SistemaMissoes:
 
     def __init__(self, capacidade_inicial_hash: int = 16):
         self._tabela = TabelaHash(capacidade_inicial=capacidade_inicial_hash)
+        self._trie = Trie()
+        self._arvore_b = ArvoreB()
+
+    def _indexar(self, corpo: CorpoCeleste) -> None:
+        self._tabela.inserir(corpo.id, corpo)
+        self._trie.inserir(corpo.nome, corpo)
+        self._arvore_b.inserir(corpo.distancia_km, corpo)
 
     # ------------------------------------------------------------------
     # Aquisicao de dados
@@ -32,17 +42,13 @@ class SistemaMissoes:
     def carregar_de_arquivo(self, caminho_json: str) -> int:
         corpos = carregar_corpos_de_arquivo(caminho_json)
         for corpo in corpos:
-            self._tabela.inserir(corpo.id, corpo)
-            #no futuro também vou inserir na Trie
-            #no futuro também vou inserir na arvore-B
+            self._tabela.indexar(corpo)
         return len(corpos)
 
     def carregar_da_api(self) -> int:
         corpos = buscar_corpos_da_api()
         for corpo in corpos:
-            self._tabela.inserir(corpo.id, corpo)
-            #no futuro também vou inserir na Trie
-            #no futuro também vou inserir na arvore-B
+            self._indexar(corpo)
         return len(corpos)
 
     # ------------------------------------------------------------------
@@ -58,8 +64,7 @@ class SistemaMissoes:
     # Arvore B na Parte 2)
     # ------------------------------------------------------------------
     def pesquisar_por_nome_parcial(self, trecho: str) -> List[CorpoCeleste]:
-        trecho_lower = trecho.lower()
-        return [c for c in self._tabela.todos_valores() if c.nome.lower().startswith(trecho_lower)]
+        return self._trie.buscar_por_prefixo(trecho)
 
     def pesquisar_por_tipo(self, tipo: str) -> List[CorpoCeleste]:
         tipo_lower = tipo.lower()
@@ -72,10 +77,10 @@ class SistemaMissoes:
         return self._tabela.todos_valores()
 
     def filtrar_por_faixa_distancia(self, minimo_km: float, maximo_km: float) -> List[CorpoCeleste]:
-        return [c for c in self._tabela.todos_valores() if minimo_km <= c.distancia_km <= maximo_km]
+        return self._arvore_b.buscar_por_faixa(minimo_km, maximo_km)
 
     def listar_ordenado_por_distancia(self) -> List[CorpoCeleste]:
-        return sorted(self._tabela.todos_valores(), key=lambda c: c.distancia_km)
+        return self._arvore_b.todos_valores()
 
     # ------------------------------------------------------------------
     # Instrumentacao
@@ -85,6 +90,12 @@ class SistemaMissoes:
 
     def imprimir_estatisticas_hash(self) -> None:
         self._tabela.imprimir_estatisticas()
+
+    def imprimir_estatisticas_trie(self) -> None:
+        self._trie.imprimir_estatisticas()
+
+    def imprimir_estatisticas_arvore_b(self) -> None:
+        self._arvore_b.imprimir_estatisticas()
 
     # ------------------------------------------------------------------
     # Planejamento guloso de rota
